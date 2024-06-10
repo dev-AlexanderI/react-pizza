@@ -11,7 +11,7 @@ let categories = ["Все", "Мясные", "Вегетарианская", "Г�
       <ul>
         {categories.map((category, id)=>{
           return (
-          <li onClick={()=>setActiveIndex(id)} className={activeIndex == id ? "active" : ""}>{category}</li>
+          <li key = {id} onClick={()=>setActiveIndex(id)} className={activeIndex == id ? "active" : ""}>{category}</li>
         )
         })}
 
