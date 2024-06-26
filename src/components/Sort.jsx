@@ -1,17 +1,21 @@
 import React from "react";
 
-function Sort() {
+function Sort({ onClickSort, value }) {
+  const [openSort, setOpenSort] = React.useState(false);
+  // const sortNames = ["популярности", "цене", "алфавиту"];
+  const sortNames = [
+    { name: "популярности (DESC)", sortProperty: "rating" },
+    { name: "популярности (ASC)", sortProperty: "-rating" },
+    { name: "цене DESC)", sortProperty: "price" },
+    { name: "цене (ASC)", sortProperty: "-price" },
+    { name: "алфавиту DESC)", sortProperty: "title" },
+    { name: "алфавиту (ASC)", sortProperty: "-title" },
+  ];
 
- const [activeSort, setActiveSort] = React.useState(0);
- const [openSort, setOpenSort] = React.useState(false)
- const sortNames = ["популярности", "цене", "алфавиту"]
- 
-
- function onClickListSort(id){
-  setActiveSort(id);
-  setOpenSort(!openSort)
- }
-
+  function onClickListSort(id) {
+    onClickSort(id);
+    setOpenSort(!openSort);
+  }
 
   return (
     <div className="sort">
@@ -29,23 +33,28 @@ function Sort() {
           />
         </svg>
         <b>Сортировка по:</b>
-        <span onClick={()=>setOpenSort(!openSort)}> {sortNames[activeSort]}</span>
+        <span onClick={() => setOpenSort(!openSort)}> {value.name}</span>
       </div>
 
-      {openSort && (<div className="sort__popup">
-        <ul>
-          {sortNames.map((name,id)=>{
-            return(
-              <li  key = {id} onClick={()=>onClickListSort(id)} className={activeSort==id?"active":""}>{name}</li>
-              
-            )
-            
-          })}
-          
-        </ul>
-        
-      </div>)}
-
+      {openSort && (
+        <div className="sort__popup">
+          <ul>
+            {sortNames.map((obj, id) => {
+              return (
+                <li
+                  key={id}
+                  onClick={() => onClickListSort(obj)}
+                  className={
+                    value.sortProperty == obj.sortProperty ? "active" : ""
+                  }
+                >
+                  {obj.name}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
