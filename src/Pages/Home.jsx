@@ -5,12 +5,14 @@ import Sort from "../components/Sort";
 import PizzaBlock from "../components/PizzaBlock";
 import SkeletonPizzas from "../components/SkeletonPizzas";
 import Pagination from "../components/Pagination";
+import { SearchContext } from "../App";
 
-function Home({ inputValue }) {
+function Home() {
   const [pizzas, setPizzas] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [categoryId, setCategoryId] = React.useState(0);
   const [currentPage, setCurrentPage] = React.useState(1);
+  const { inputValue } = React.useContext(SearchContext);
 
   const [sortType, setSortType] = React.useState({
     name: "популярности",
@@ -36,7 +38,6 @@ function Home({ inputValue }) {
       });
     window.scrollTo(0, 0);
   }, [categoryId, sortType, inputValue, currentPage]);
-
   return (
     <div className="container">
       <div className="content__top">
@@ -49,8 +50,8 @@ function Home({ inputValue }) {
       <h2 className="content__title">Все пиццы</h2>
       <div className="content__items">
         {isLoading
-          ? [...new Array(6)].map((item) => {
-              return <SkeletonPizzas />;
+          ? [...new Array(6)].map((_, id) => {
+              return <SkeletonPizzas key={id} />;
             })
           : pizzas.map((pizza) => {
               return <PizzaBlock key={pizza.id} {...pizza} />;
