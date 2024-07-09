@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-
+import { useSelector, useDispatch } from "react-redux";
 import Categories from "../components/Categories";
 import Sort from "../components/Sort";
 import PizzaBlock from "../components/PizzaBlock";
@@ -7,27 +7,31 @@ import SkeletonPizzas from "../components/SkeletonPizzas";
 import Pagination from "../components/Pagination";
 import { SearchContext } from "../App";
 
+import { setCategoryId } from "../Redux/slices/filterSlice";
+
 function Home() {
+  const dispatch = useDispatch();
+
+  const { categoryId, sort } = useSelector((state) => state.filter);
+
   const [pizzas, setPizzas] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
-  const [categoryId, setCategoryId] = React.useState(0);
   const [currentPage, setCurrentPage] = React.useState(1);
   const { inputValue } = React.useContext(SearchContext);
 
-  const [sortType, setSortType] = React.useState({
-    name: "популярности",
-    sortProperty: "rating",
-  });
-
   const search = inputValue ? `&search=${inputValue}` : "";
-  const sortBy = sortType.sortProperty.replace("-", "");
-  const order = sortType.sortProperty.includes("-") ? "ASC" : "DESC";
+  const sortBy = sort.sortProperty.replace("-", "");
+  const order = sort.sortProperty.includes("-") ? "ASC" : "DESC";
   const category = categoryId > 0 ? `category=${categoryId}` : "";
+
+  function changeCategoryId(id) {
+    dispatch(setCategoryId(id));
+  }
 
   useEffect(() => {
     setIsLoading(true);
     fetch(
-      `https://666714afa2f8516ff7a6383f.mockapi.io/pizzaList?page=${currentPage}&limit=4${category}&sortBy=${sortBy}&order=${order}${search}`
+      `https://666714afa2f8516ff7a6383f.mockapi.io/pizzaList?page=${currentPage}&limit=4&${category}&sortBy=${sortBy}&order=${order}${search}`
     )
       .then((promise) => {
         return promise.json();
@@ -37,15 +41,15 @@ function Home() {
         setIsLoading(false);
       });
     window.scrollTo(0, 0);
-  }, [categoryId, sortType, inputValue, currentPage]);
+  }, [categoryId, sort.sortProperty, inputValue, currentPage]);
   return (
     <div className="container">
       <div className="content__top">
         <Categories
           value={categoryId}
-          onClickCategory={(i) => setCategoryId(i)}
+          onClickCategory={(i) => changeCategoryId(i)}
         />
-        <Sort value={sortType} onClickSort={(i) => setSortType(i)} />
+        <Sort />
       </div>
       <h2 className="content__title">Все пиццы</h2>
       <div className="content__items">
