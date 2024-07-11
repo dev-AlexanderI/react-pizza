@@ -2,9 +2,29 @@ import React from "react";
 
 import styles from "./Search.module.scss";
 import { SearchContext } from "../../App";
+import debounce from "lodash.debounce";
 
 function Search() {
-  const { inputValue, setInputValue } = React.useContext(SearchContext);
+  const [value, setValue] = React.useState("");
+  const { setInputValue } = React.useContext(SearchContext);
+  const inputRef = React.useRef();
+
+  function deleteInputValue() {
+    setInputValue("");
+    setValue("");
+    inputRef.current.focus();
+  }
+
+  const updateSearchValue = React.useCallback(
+    debounce((str) => {
+      setInputValue(str);
+    }, 300),
+    []
+  );
+  const onChangeInput = (event) => {
+    setValue(event.target.value);
+    updateSearchValue(event.target.value);
+  };
   return (
     <div className={styles.root}>
       <svg
@@ -17,15 +37,16 @@ function Search() {
         <path d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z" />
       </svg>
       <input
-        value={inputValue}
-        onChange={(event) => setInputValue(event.target.value)}
+        ref={inputRef}
+        value={value}
+        onChange={(event) => onChangeInput(event)}
         className={styles.input}
         placeholder="Поиск пицц..."
         type="text"
       />
-      {inputValue && (
+      {value && (
         <svg
-          onClick={() => setInputValue("")}
+          onClick={() => deleteInputValue()}
           className={styles.close}
           height="48"
           viewBox="0 0 48 48"
